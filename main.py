@@ -51,7 +51,7 @@ def Diafonizacion(frase: str) -> str:
     difonos.append(f"{frase[-1]}-")
 
     # Combinar los difonos con espacios y devolverlos como cadena
-    return " ".join(difonos)
+    return "".join(difonos)
 
 
 
