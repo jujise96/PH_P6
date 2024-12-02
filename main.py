@@ -1,6 +1,8 @@
 #Alejandro Perez Dominguez
 #Juan Jimenez Serrano
 import re
+import pydub
+from pydub import AudioSegment
 
 def CheckString(frase: str) -> bool:
     # Verificar si la frase contiene espacios o caracteres inválidos
@@ -55,6 +57,20 @@ def Diafonizacion(frase: str) -> list:
 
 
 
+
+
+# Cargar los dos archivos de audio
+audio1 = AudioSegment.from_file("./sample_data/audio1.wav", format="wav")
+audio2 = AudioSegment.from_file("./sample_data/audio2.wav", format="wav")
+
+# Definir la duración del crossfade en milisegundos (por ejemplo, 1000 ms = 1 segundo)
+crossfade_duration = 100  # Duración del crossfade en milisegundos
+
+# Realizar el crossfade
+audio_output = audio1.append(audio2, crossfade=crossfade_duration)
+
+# Guardar el resultado
+audio_output.export("salida.wav", format="wav")
 
 
 print(Diafonizacion("ala"))     # Salida: -a al la a-
