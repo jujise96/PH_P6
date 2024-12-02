@@ -3,6 +3,7 @@
 import re
 import pydub
 from pydub import AudioSegment
+import os
 
 def CheckString(frase: str) -> bool:
     # Verificar si la frase contiene espacios o caracteres inválidos
@@ -34,6 +35,7 @@ def CheckString(frase: str) -> bool:
     return bool(re.fullmatch(pattern, frase, re.VERBOSE | re.IGNORECASE))
 
 
+
 def Diafonizacion(frase: str) -> list:
     # Llamar a CheckString para validar la cadena
     if not CheckString(frase):
@@ -52,28 +54,60 @@ def Diafonizacion(frase: str) -> list:
     # Añadir un guion final para el último difono
     difonos.append(f"{frase[-1]}-")
 
-    # Devolver la lista de difonos
+    # Modificar los difonos que contienen una "A" mayúscula
+    for i in range(len(difonos)):
+        if 'A' in difonos[i]:
+            difonos[i] = f"{difonos[i]}_acentuado"  # Añadir '_acentuado' si contiene 'A'
+
+    # Devolver la lista de difonos modificados
     return difonos
 
-
-
-
-
-# Cargar los dos archivos de audio
-audio1 = AudioSegment.from_file("./sample_data/audio1.wav", format="wav")
-audio2 = AudioSegment.from_file("./sample_data/audio2.wav", format="wav")
-
-# Definir la duración del crossfade en milisegundos (por ejemplo, 1000 ms = 1 segundo)
-crossfade_duration = 100  # Duración del crossfade en milisegundos
-
-# Realizar el crossfade
-audio_output = audio1.append(audio2, crossfade=crossfade_duration)
-
-# Guardar el resultado
-audio_output.export("salida.wav", format="wav")
-
-
-print(Diafonizacion("ala"))     # Salida: -a al la a-
+print(Diafonizacion("alA"))     # Salida: -a al la a-
 print(Diafonizacion("aflas"))   # Salida: -a af fl la as s-
 print(Diafonizacion("flas"))    # Salida: La cadena no cumple con las normas.
 print(Diafonizacion("as"))      # Salida: -t tl ls s-
+
+
+
+
+
+'''
+def CrearAudios(difonos: list, output_filename: str):
+    # Definir la carpeta donde se encuentran los difonos
+    difonos_folder = "./Difonos/"
+
+    # Inicializar un objeto AudioSegment vacío
+    audio_output = AudioSegment.silent(duration=0)  # Empezamos con un silencio vacío
+
+    # Definir la duración del crossfade en milisegundos (por ejemplo, 100 ms = 0.1 segundos)
+    crossfade_duration = 100  # Puedes modificar esta duración según lo necesites
+
+    # Iterar sobre los difonos en la lista y concatenarlos
+    for difono in difonos:
+        # Construir la ruta del archivo para cada difono
+
+
+
+        #debemos cambiar A_acentuado para que coja los audios
+
+
+
+        difono_filename = difono + ".wav"
+        difono_path = os.path.join(difonos_folder, difono_filename)
+
+        # Comprobar si el archivo existe
+        if os.path.exists(difono_path):
+            # Cargar el archivo de audio del difono
+            audio = AudioSegment.from_file(difono_path, format="wav")
+
+            # Realizar el crossfade y concatenar con el audio actual
+            audio_output = audio_output.append(audio, crossfade=crossfade_duration)
+        else:
+            print(f"El archivo {difono_filename} no se encontró en la carpeta de difonos.")
+
+    # Exportar el audio resultante a un archivo .wav
+    audio_output.export(output_filename, format="wav")
+    print(f"Archivo de audio generado: {output_filename}")
+
+'''
+
