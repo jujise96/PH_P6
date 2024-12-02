@@ -1,5 +1,6 @@
+#Alejandro Perez Dominguez
+#Juan Jimenez Serrano
 import re
-
 
 def CheckString(frase: str) -> bool:
     # Verificar si la frase contiene espacios o caracteres inválidos
@@ -14,44 +15,43 @@ def CheckString(frase: str) -> bool:
     if 'ms' in frase:
         return False
 
+
     # Definir el patrón permitido
     pattern = r"""
     ^(                   # Inicio del patrón
-        a|               # Vocal sola (V)
-        b|f|t|l|s|       # Primera consonante
+        a?               # Vocal sola (V)
+        b|f|t|l|s|m|     # Primera consonante
         bl|fl|tl|        # CCV (b/f/t seguido de l)
         a                # Vocal (después de C o CC)
         s?               # Opcional: s para formar VC o CVC
-    )$                   # Fin del patrón
+    )+                       # Una o más veces
+    $                        # Fin del patrón
     """
 
     # Usar expresiones regulares para validar la cadena
     return bool(re.fullmatch(pattern, frase, re.VERBOSE | re.IGNORECASE))
 
-def Diafonizacion(frase: str) -> str:
-    # Verificar si la cadena está vacía
-    if not frase:
-        return "La cadena debe contener algo"
 
+def Diafonizacion(frase: str) -> list:
     # Llamar a CheckString para validar la cadena
     if not CheckString(frase):
-        return "La cadena no cumple con las normas."
+        raise ValueError("La cadena no cumple con las normas.")
 
     # Lista para almacenar los difonos
     difonos = []
 
-    # Incluir un guion inicial para el primer difono
+    # Añadir un guion inicial para el primer difono
     difonos.append(f"-{frase[0]}")
 
     # Generar los difonos intermedios
     for i in range(len(frase) - 1):
         difonos.append(f"{frase[i]}{frase[i + 1]}")
 
-    # Incluir un guion final para el último difono
+    # Añadir un guion final para el último difono
     difonos.append(f"{frase[-1]}-")
 
-    # Combinar los difonos con espacios y devolverlos como cadena
-    return "".join(difonos)
+    # Devolver la lista de difonos
+    return difonos
 
 
 
