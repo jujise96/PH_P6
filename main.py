@@ -6,7 +6,7 @@ import os
 
 def CheckString(frase: str) -> bool:
     # Verificar si la frase contiene espacios o caracteres inválidos
-    if any(char not in "aAbflmts" for char in frase):
+    if any(char not in "aAbflmts?" for char in frase):
         return False
 
     # Verificar si la frase empieza por 'm'
@@ -14,19 +14,23 @@ def CheckString(frase: str) -> bool:
         return False
 
     # Verificar si la letra 'm' no está seguida de 's'
-    if 'ms' in frase:
+    if 'sm' in frase:
         return False
 
+    #Verificar que la letra en la que termina es válida
+    if not frase[-1] in ["?", "a", "s", "A"]:
+        return False
 
     # Definir el patrón permitido
     pattern = r"""
     ^(                   # Inicio del patrón
-        a?               # Vocal sola (V)
+        a?               # Opcional: Vocal sola (V)
         b|f|t|l|s|m|     # Primera consonante
         bl|fl|tl|        # CCV (b/f/t seguido de l)
         a                # Vocal (después de C o CC)
         s?               # Opcional: s para formar VC o CVC
     )+                       # Una o más veces
+    \??                  # Opcional: literal '?' al final
     $                        # Fin del patrón
     """
 
@@ -36,10 +40,11 @@ def CheckString(frase: str) -> bool:
 
 def Diafonizacion(frase: str) -> list:
 
-
     # Lista para almacenar los difonos
     difonos = []
 
+    if frase.endswith("?"):
+        frase = frase[:-1] #le quita el ultimo caracter
     # Añadir un guion inicial para el primer difono
     difonos.append(f"-{frase[0]}")
 
@@ -50,10 +55,14 @@ def Diafonizacion(frase: str) -> list:
     # Añadir un guion final para el último difono
     difonos.append(f"{frase[-1]}-")
 
-    # Modificar los difonos que contienen una "A" mayúscula
-    for i in range(len(difonos)):
-        if 'A' in difonos[i]:
-            difonos[i] = f"{difonos[i]}_acentuado"  # Añadir '_acentuado' si contiene 'A'
+    # Modificar los difonos que contienen una "A" mayúscula y borrar los fl, tl, bl
+    difonos = [
+        f"{difono}_acentuado" if 'A' in difono else difono #si contiene una A se transforma en []_acentuado, si no, se queda como esta
+        for difono in difonos
+        if difono not in ["fl", "tl", "bl"]
+        #solo mantiene los que NO se encuentran en la lista [fl, tl, bl]
+        #por tanto, los que tengan ese patron, los borra
+    ]
 
     # Devolver la lista de difonos modificados
     return difonos
@@ -73,7 +82,7 @@ def CrearAudios(frase: str, output_filename: str):
         audio_output = AudioSegment.silent(duration=500)  # Empezamos con un silencio vacío
 
     # Definir la duración del crossfade en milisegundos (por ejemplo, 100 ms = 0.1 segundos)
-        crossfade_duration = 20  # Puedes modificar esta duración según lo necesites
+        crossfade_duration = 13
 
     # Iterar sobre los difonos en la lista y concatenarlos
         for difono in difonos:
@@ -97,5 +106,5 @@ def CrearAudios(frase: str, output_filename: str):
         print(f"Archivo de audio generado: {output_filename}")
 
 
-CrearAudios("fAstaba", "salida.wav")
+CrearAudios("blablablA", "salida.wav")
 
