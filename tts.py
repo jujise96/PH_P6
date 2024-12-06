@@ -1,16 +1,15 @@
 #Alejandro Perez Dominguez
 #Juan Jimenez Serrano
-import argparse
+import re
+from pydub import AudioSegment
+from pydub.playback import play
 import os
-from re import fullmatch, VERBOSE, IGNORECASE
-
 import librosa
 import numpy
 import soundfile as sf
-from pydub import AudioSegment
+import argparse
 
-
-def checkstring(frase: str) -> bool:
+def CheckString(frase: str) -> bool:
     # Verificar si la frase contiene espacios o caracteres inválidos
     if any(char not in "aAbflmts?" for char in frase):
         return False
@@ -41,10 +40,10 @@ def checkstring(frase: str) -> bool:
     """
 
     # Usar expresiones regulares para validar la cadena
-    return bool(fullmatch(pattern, frase, VERBOSE | IGNORECASE))
+    return bool(re.fullmatch(pattern, frase, re.VERBOSE | re.IGNORECASE))
 
 
-def diafonizacion(frase: str) -> list:
+def Diafonizacion(frase: str) -> list:
 
     # Lista para almacenar los difonos
     difonos = []
@@ -99,15 +98,15 @@ def transformar_a_pregunta(input_audio, output_audio):
     # Guardar el archivo modificado
     sf.write(output_audio, audio_modificado, sr)
 
-def crearaudios(frase: str, output_filename: str):
+def crearAudios(frase: str, output_filename: str):
     # Llamar a CheckString para validar la cadena
-    if not checkstring(frase):
+    if not CheckString(frase):
         print("La cadena no cumple con las normas.")
     else:
     # Definir la carpeta donde se encuentran los difonos
         difonos_folder = "./Difonos/"
 
-        difonos = diafonizacion(frase)
+        difonos = Diafonizacion(frase)
 
      # Inicializar un objeto AudioSegment vacío
         audio_output = AudioSegment.silent(duration=100)  # Empezamos con un silencio vacío
@@ -134,7 +133,7 @@ def crearaudios(frase: str, output_filename: str):
         audio_output = audio_output.append(AudioSegment.silent(duration=200))
 
     # Exportar el audio resultante a un archivo .wav
-        audio_output.export(output_filename, format="wav")
+        audio_output.export("./" + output_filename, format="wav")
         if frase.endswith("?"):
             transformar_a_pregunta(output_filename, output_filename)
             print("se ha transformado el audio en una pregunta")
@@ -155,7 +154,7 @@ def main():
     args = parser.parse_args()
 
     # Llamar a la función CrearAudios con los parámetros proporcionados
-    crearaudios(args.frase, args.output_filename)
+    crearAudios(args.frase, args.output_filename)
 
 if __name__ == "__main__":
     main()
