@@ -2,14 +2,13 @@
 #Juan Jimenez Serrano
 import re
 from pydub import AudioSegment
-from pydub.playback import play
 import os
 import librosa
 import numpy
 import soundfile as sf
 import argparse
 
-def CheckString(frase: str) -> bool:
+def checkString(frase: str) -> bool:
     # Verificar si la frase contiene espacios o caracteres inválidos
     if any(char not in "aAbflmts?" for char in frase):
         return False
@@ -43,7 +42,7 @@ def CheckString(frase: str) -> bool:
     return bool(re.fullmatch(pattern, frase, re.VERBOSE | re.IGNORECASE))
 
 
-def Diafonizacion(frase: str) -> list:
+def diafonizacion(frase: str) -> list:
 
     # Lista para almacenar los difonos
     difonos = []
@@ -100,13 +99,13 @@ def transformar_a_pregunta(input_audio, output_audio):
 
 def crearAudios(frase: str, output_filename: str):
     # Llamar a CheckString para validar la cadena
-    if not CheckString(frase):
+    if not checkString(frase):
         print("La cadena no cumple con las normas.")
     else:
     # Definir la carpeta donde se encuentran los difonos
         difonos_folder = "./Difonos/"
 
-        difonos = Diafonizacion(frase)
+        difonos = diafonizacion(frase)
 
      # Inicializar un objeto AudioSegment vacío
         audio_output = AudioSegment.silent(duration=100)  # Empezamos con un silencio vacío
