@@ -8,7 +8,7 @@ import numpy
 import soundfile as sf
 import argparse
 
-def checkString(frase: str) -> bool:
+def checkstring(frase: str) -> bool:
     # Verificar si la frase contiene espacios o caracteres inválidos
     if any(char not in "aAbflmts?" for char in frase):
         return False
@@ -97,9 +97,9 @@ def transformar_a_pregunta(input_audio, output_audio):
     # Guardar el archivo modificado
     sf.write(output_audio, audio_modificado, sr)
 
-def crearAudios(frase: str, output_filename: str):
+def crearaudios(frase: str, output_filename: str):
     # Llamar a CheckString para validar la cadena
-    if not checkString(frase):
+    if not checkstring(frase):
         print("La cadena no cumple con las normas.")
     else:
     # Definir la carpeta donde se encuentran los difonos
@@ -153,7 +153,7 @@ def main():
     args = parser.parse_args()
 
     # Llamar a la función CrearAudios con los parámetros proporcionados
-    crearAudios(args.frase, args.output_filename)
+    crearaudios(args.frase, args.output_filename)
 
 if __name__ == "__main__":
     main()
