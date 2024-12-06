@@ -98,7 +98,7 @@ def transformar_a_pregunta(input_audio, output_audio):
     # Guardar el archivo modificado
     sf.write(output_audio, audio_modificado, sr)
 
-def CrearAudios(frase: str, output_filename: str):
+def crearAudios(frase: str, output_filename: str):
     # Llamar a CheckString para validar la cadena
     if not CheckString(frase):
         print("La cadena no cumple con las normas.")
@@ -129,11 +129,11 @@ def CrearAudios(frase: str, output_filename: str):
                 audio_output = audio_output.append(audio, crossfade=crossfade_duration)
             else:
                 print(f"El archivo {difono_filename} no se encontró en la carpeta de difonos.")
-                break;
+                break
         audio_output = audio_output.append(AudioSegment.silent(duration=200))
 
     # Exportar el audio resultante a un archivo .wav
-        audio_output.export(output_filename, format="wav")
+        audio_output.export("./" + output_filename, format="wav")
         if frase.endswith("?"):
             transformar_a_pregunta(output_filename, output_filename)
             print("se ha transformado el audio en una pregunta")
@@ -154,7 +154,7 @@ def main():
     args = parser.parse_args()
 
     # Llamar a la función CrearAudios con los parámetros proporcionados
-    CrearAudios(args.frase, args.output_filename)
+    crearAudios(args.frase, args.output_filename)
 
 if __name__ == "__main__":
     main()
