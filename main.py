@@ -2,7 +2,12 @@
 #Juan Jimenez Serrano
 import re
 from pydub import AudioSegment
+from pydub.playback import play
 import os
+import librosa
+import numpy
+import soundfile as sf
+import argparse
 
 def CheckString(frase: str) -> bool:
     # Verificar si la frase contiene espacios o caracteres inválidos
@@ -68,6 +73,31 @@ def Diafonizacion(frase: str) -> list:
     return difonos
 
 
+def transformar_a_pregunta(input_audio, output_audio):
+    # Cargar audio y la tasa de muestreo
+    y, sr = librosa.load(input_audio)
+
+    # Duración y punto de división
+    duracion = len(y)
+    punto_division1 = int(duracion * 0.6)
+    punto_division2 = int(duracion * 0.7)
+
+    # Dividir en partes
+    inicio = y[:punto_division1]
+    medio = y[punto_division1:punto_division2]
+    fin = y[punto_division2:]
+
+    # Incrementar el pitch en la parte final
+    fin_modificado = librosa.effects.pitch_shift(fin, sr=sr, n_steps=2)  # +2 semitonos
+    medio_modificado = librosa.effects.pitch_shift(medio, sr=sr, n_steps=0.5)
+    inicio_modificado = librosa.effects.pitch_shift(inicio, sr=sr, n_steps=-0.5)  # +2 semitonos
+
+    # Combinar las partes
+    audio_modificado = numpy.concatenate([inicio_modificado, medio_modificado, fin_modificado])
+
+    # Guardar el archivo modificado
+    sf.write(output_audio, audio_modificado, sr)
+
 def CrearAudios(frase: str, output_filename: str):
     # Llamar a CheckString para validar la cadena
     if not CheckString(frase):
@@ -79,7 +109,7 @@ def CrearAudios(frase: str, output_filename: str):
         difonos = Diafonizacion(frase)
 
      # Inicializar un objeto AudioSegment vacío
-        audio_output = AudioSegment.silent(duration=500)  # Empezamos con un silencio vacío
+        audio_output = AudioSegment.silent(duration=100)  # Empezamos con un silencio vacío
 
     # Definir la duración del crossfade en milisegundos (por ejemplo, 100 ms = 0.1 segundos)
         crossfade_duration = 13
@@ -99,12 +129,32 @@ def CrearAudios(frase: str, output_filename: str):
                 audio_output = audio_output.append(audio, crossfade=crossfade_duration)
             else:
                 print(f"El archivo {difono_filename} no se encontró en la carpeta de difonos.")
-        audio_output = audio_output.append(AudioSegment.silent(duration=500))
+                break;
+        audio_output = audio_output.append(AudioSegment.silent(duration=200))
 
     # Exportar el audio resultante a un archivo .wav
         audio_output.export(output_filename, format="wav")
+        if frase.endswith("?"):
+            transformar_a_pregunta(output_filename, output_filename)
+            print("se ha transformado el audio en una pregunta")
+
+
         print(f"Archivo de audio generado: {output_filename}")
 
 
-CrearAudios("blablablA", "salida.wav")
+def main():
+    # Crear el parser de argumentos
+    parser = argparse.ArgumentParser(description="Crear audios a partir de una frase.")
 
+    # Definir los parámetros que aceptará el script
+    parser.add_argument("frase", type=str, help="La frase para generar el audio.")
+    parser.add_argument("output_filename", type=str, help="El nombre del archivo de salida (ejemplo: salida.wav)")
+
+    # Parsear los argumentos
+    args = parser.parse_args()
+
+    # Llamar a la función CrearAudios con los parámetros proporcionados
+    CrearAudios(args.frase, args.output_filename)
+
+if __name__ == "__main__":
+    main()
