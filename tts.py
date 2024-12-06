@@ -1,15 +1,16 @@
 #Alejandro Perez Dominguez
 #Juan Jimenez Serrano
-import re
-from pydub import AudioSegment
-from pydub.playback import play
+import argparse
 import os
+from re import fullmatch, VERBOSE, IGNORECASE
+
 import librosa
 import numpy
 import soundfile as sf
-import argparse
+from pydub import AudioSegment
 
-def CheckString(frase: str) -> bool:
+
+def checkstring(frase: str) -> bool:
     # Verificar si la frase contiene espacios o caracteres inválidos
     if any(char not in "aAbflmts?" for char in frase):
         return False
@@ -40,10 +41,10 @@ def CheckString(frase: str) -> bool:
     """
 
     # Usar expresiones regulares para validar la cadena
-    return bool(re.fullmatch(pattern, frase, re.VERBOSE | re.IGNORECASE))
+    return bool(fullmatch(pattern, frase, VERBOSE | IGNORECASE))
 
 
-def Diafonizacion(frase: str) -> list:
+def diafonizacion(frase: str) -> list:
 
     # Lista para almacenar los difonos
     difonos = []
@@ -98,15 +99,15 @@ def transformar_a_pregunta(input_audio, output_audio):
     # Guardar el archivo modificado
     sf.write(output_audio, audio_modificado, sr)
 
-def CrearAudios(frase: str, output_filename: str):
+def crearaudios(frase: str, output_filename: str):
     # Llamar a CheckString para validar la cadena
-    if not CheckString(frase):
+    if not checkstring(frase):
         print("La cadena no cumple con las normas.")
     else:
     # Definir la carpeta donde se encuentran los difonos
         difonos_folder = "./Difonos/"
 
-        difonos = Diafonizacion(frase)
+        difonos = diafonizacion(frase)
 
      # Inicializar un objeto AudioSegment vacío
         audio_output = AudioSegment.silent(duration=100)  # Empezamos con un silencio vacío
@@ -129,7 +130,7 @@ def CrearAudios(frase: str, output_filename: str):
                 audio_output = audio_output.append(audio, crossfade=crossfade_duration)
             else:
                 print(f"El archivo {difono_filename} no se encontró en la carpeta de difonos.")
-                break;
+                break
         audio_output = audio_output.append(AudioSegment.silent(duration=200))
 
     # Exportar el audio resultante a un archivo .wav
@@ -154,7 +155,7 @@ def main():
     args = parser.parse_args()
 
     # Llamar a la función CrearAudios con los parámetros proporcionados
-    CrearAudios(args.frase, args.output_filename)
+    crearaudios(args.frase, args.output_filename)
 
 if __name__ == "__main__":
     main()
