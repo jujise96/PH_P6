@@ -63,9 +63,6 @@ def diafonizacion(frase: str) -> list:
     difonos = [
         f"{difono}_acentuado" if 'A' in difono else difono #si contiene una A se transforma en []_acentuado, si no, se queda como esta
         for difono in difonos
-        if difono not in ["fl", "tl", "bl"]
-        #solo mantiene los que NO se encuentran en la lista [fl, tl, bl]
-        #por tanto, los que tengan ese patron, los borra
     ]
 
     # Devolver la lista de difonos modificados
